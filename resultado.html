@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resultados Eurovisión</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -10,16 +9,16 @@
   <div class="container">
     <h1>Resultados Finales</h1>
     <div id="resultados"></div>
-    <div id="resumen" style="margin-top: 2rem; font-size: 1.2rem; color: white;"></div>
+    <div id="resumen" style="margin-top: 2rem;"></div>
   </div>
   <script>
-    const votos1 = JSON.parse(localStorage.getItem('votos_user1')) || [];
-    const votos2 = JSON.parse(localStorage.getItem('votos_user2')) || [];
+    const votos1 = JSON.parse(localStorage.getItem('votos_usuario1')) || [];
+    const votos2 = JSON.parse(localStorage.getItem('votos_usuario2')) || [];
     const topFinal = JSON.parse(localStorage.getItem('top10_final')) || [];
 
     const resultadosDiv = document.getElementById("resultados");
 
-    if (!votos1.length || !votos2.length || !topFinal.length) {
+    if (!votos1 || !votos2 || !topFinal.length) {
       resultadosDiv.innerHTML = "<p style='color: yellow;'>Faltan datos de votación o ranking final.</p>";
     } else {
       const tabla = document.createElement("table");
@@ -35,53 +34,40 @@
         <tbody></tbody>
       `;
 
-      let aciertos1 = 0;
-      let aciertos2 = 0;
-      let difTotal1 = 0;
-      let difTotal2 = 0;
-
+      let aciertos1 = 0, aciertos2 = 0, difTotal1 = 0, difTotal2 = 0;
       const cuerpo = tabla.querySelector("tbody");
 
       for (let i = 1; i <= 10; i++) {
-        const pais = topFinal.find(p => p.posicion === i);
+        const pais = topFinal.find(p => parseInt(p.posicion) === i);
+        if (!pais) continue;
+        const voto1 = votos1[pais.pais] || '-';
+        const voto2 = votos2[pais.pais] || '-';
 
-        const voto1 = votos1.find(v => v.pais === pais.pais);
-        const voto2 = votos2.find(v => v.pais === pais.pais);
+        if (voto1 === i) aciertos1++;
+        if (voto2 === i) aciertos2++;
 
-        const pos1 = voto1 ? voto1.puntos : '-';
-        const pos2 = voto2 ? voto2.puntos : '-';
-
-        if (pos1 === i) aciertos1++;
-        if (pos2 === i) aciertos2++;
-
-        if (typeof pos1 === 'number') difTotal1 += Math.abs(pos1 - i);
-        if (typeof pos2 === 'number') difTotal2 += Math.abs(pos2 - i);
+        if (typeof voto1 === 'number') difTotal1 += Math.abs(voto1 - i);
+        if (typeof voto2 === 'number') difTotal2 += Math.abs(voto2 - i);
 
         cuerpo.innerHTML += `
           <tr>
             <td>${i}</td>
             <td>${pais.pais}</td>
-            <td>${pos1}</td>
-            <td>${pos2}</td>
+            <td>${voto1}</td>
+            <td>${voto2}</td>
           </tr>
         `;
       }
 
       resultadosDiv.appendChild(tabla);
 
-      let ganador;
-      if (aciertos1 > aciertos2) {
-        ganador = "🎉 Ganador: Usuario 1 (más aciertos exactos)";
-      } else if (aciertos2 > aciertos1) {
-        ganador = "🎉 Ganador: Usuario 2 (más aciertos exactos)";
-      } else {
-        ganador = "🤝 Empate en aciertos exactos";
-      }
+      let ganador = aciertos1 > aciertos2 ? "🎉 Ganador: Usuario 1" :
+                    aciertos2 > aciertos1 ? "🎉 Ganador: Usuario 2" : "🤝 Empate";
 
       document.getElementById("resumen").innerHTML = `
         <p><strong>Aciertos exactos</strong> → Usuario 1: ${aciertos1}, Usuario 2: ${aciertos2}</p>
         <p><strong>Diferencia total</strong> → Usuario 1: ${difTotal1}, Usuario 2: ${difTotal2}</p>
-        <p style="margin-top: 1rem; font-weight: bold; color: gold;">${ganador}</p>
+        <p style="font-weight: bold; color: gold;">${ganador}</p>
       `;
     }
   </script>
