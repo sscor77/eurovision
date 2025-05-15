@@ -5,7 +5,6 @@ body {
   margin: 0;
   padding: 2rem;
 }
-
 .container {
   max-width: 800px;
   margin: auto;
@@ -14,21 +13,51 @@ body {
   border-radius: 1rem;
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
-
 h1, h2 {
   text-align: center;
   color: #ffd700;
   margin-bottom: 1.5rem;
   font-family: 'Trebuchet MS', sans-serif;
 }
-
-.menu {
+.pais {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease;
 }
-
+.pais:hover {
+  background: rgba(255,255,255,0.1);
+}
+.pais img {
+  width: 48px;
+  height: auto;
+  margin-right: 15px;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+}
+.pais label {
+  flex: 1;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+select {
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  background-color: #1b263b;
+  color: white;
+  font-weight: bold;
+  appearance: none;
+}
+select:focus {
+  outline: 2px solid #ffd700;
+}
 .btn {
   background-color: #1e90ff;
   color: white;
@@ -40,83 +69,9 @@ h1, h2 {
   font-weight: bold;
   transition: background-color 0.3s ease;
   cursor: pointer;
+  display: block;
+  margin: 2rem auto 0;
 }
-
 .btn:hover {
   background-color: #0d6efd;
-}
-
-.btn.danger {
-  background-color: #dc3545;
-}
-
-.btn.danger:hover {
-  background-color: #bb2d3b;
-}
-
-.pais {
-  display: flex;
-  align-items: center;
-  background: rgba(255,255,255,0.05);
-  border-radius: 10px;
-  padding: 0.5rem 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
-  transition: background 0.3s ease;
-}
-
-.pais:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-.pais img {
-  width: 48px;
-  height: auto;
-  margin-right: 15px;
-  border-radius: 4px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
-}
-
-.pais label {
-  flex: 1;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-select {
-  padding: 0.4rem 0.6rem;
-  font-size: 1rem;
-  border-radius: 0.5rem;
-  border: none;
-  background-color: #1b263b;
-  color: white;
-  font-weight: bold;
-  appearance: none;
-}
-
-select:focus {
-  outline: 2px solid #ffd700;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 2rem;
-}
-
-th, td {
-  border: 1px solid #fff;
-  padding: 0.5rem;
-  text-align: center;
-  font-size: 1rem;
-}
-
-th {
-  background-color: #1e3a5f;
-  color: #ffd700;
-}
-
-#resumen p {
-  margin: 0.5rem 0;
 }
