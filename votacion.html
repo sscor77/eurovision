@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Votación - Usuario</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Votación Usuario</h1>
+    <form id="votacion-form">
+      <!-- Aquí irán los campos de selección de puntos de los 10 países -->
+      <button type="submit" class="btn">Enviar Votación</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('votacion-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const votos = [];
+      for (let i = 1; i <= 10; i++) {
+        const puntos = document.getElementById(`pais${i}`).value;
+        votos.push({ pais: `Pais ${i}`, puntos: puntos });
+      }
+      const usuario = new URLSearchParams(window.location.search).get('user');
+      localStorage.setItem(`votos_user${usuario}`, JSON.stringify(votos));
+      alert('Votación guardada correctamente.');
+    });
+  </script>
+</body>
+</html>
