@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Votación Usuario 2</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { text-align: center; }
+    .pais { display: flex; align-items: center; margin-bottom: 10px; }
+    .pais img { width: 40px; height: auto; margin-right: 10px; }
+    select { margin-left: auto; }
+  </style>
+</head>
+<body>
+  <h1>Votación Usuario 2</h1>
+  <form id="formUsuario2">
+    <div id="listaPaises"></div>
+    <button type="submit">Enviar Votación</button>
+  </form>
+  <script>
+    const paises = [
+      { codigo: "se", nombre: "Suecia" },
+      { codigo: "es", nombre: "España" },
+      { codigo: "it", nombre: "Italia" },
+      { codigo: "fr", nombre: "Francia" },
+      { codigo: "de", nombre: "Alemania" },
+      { codigo: "gr", nombre: "Grecia" },
+      { codigo: "no", nombre: "Noruega" },
+      { codigo: "gb", nombre: "Reino Unido" },
+      { codigo: "pl", nombre: "Polonia" },
+      { codigo: "ua", nombre: "Ucrania" }
+    ];
+
+    const lista = document.getElementById("listaPaises");
+
+    paises.forEach(pais => {
+      const div = document.createElement("div");
+      div.className = "pais";
+      div.innerHTML = `
+        <img src="images/${pais.codigo}.svg" alt="${pais.nombre}">
+        <span>${pais.nombre}</span>
+        <select name="${pais.codigo}">
+          <option value="">--</option>
+          ${[12,10,8,7,6,5,4,3,2,1].map(p => `<option value="${p}">${p}</option>`).join('')}
+        </select>
+      `;
+      lista.appendChild(div);
+    });
+
+    document.getElementById("formUsuario2").addEventListener("submit", e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const votos = {};
+      const usados = new Set();
+      for (let [clave, valor] of formData.entries()) {
+        if (valor) {
+          if (usados.has(valor)) {
+            alert("No puedes repetir puntuaciones.");
+            return;
+          }
+          usados.add(valor);
+          votos[clave] = Number(valor);
+        }
+      }
+      if (Object.keys(votos).length !== 10) {
+        alert("Debes asignar puntuación a los 10 países.");
+        return;
+      }
+      localStorage.setItem("votos_usuario2", JSON.stringify(votos));
+      alert("¡Votación guardada para Usuario 2!");
+    });
+  </script>
+</body>
+</html>
