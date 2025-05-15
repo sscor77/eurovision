@@ -3,20 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Votación Usuario 1</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h1 { text-align: center; }
-    .pais { display: flex; align-items: center; margin-bottom: 10px; }
-    .pais img { width: 40px; height: auto; margin-right: 10px; }
-    select { margin-left: auto; }
-  </style>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <h1>Votación Usuario 1</h1>
-  <form id="formUsuario1">
-    <div id="listaPaises"></div>
-    <button type="submit">Enviar Votación</button>
-  </form>
+  <div class="container">
+    <h1>Votación Usuario 1</h1>
+    <form id="formUsuario1">
+      <div id="listaPaises"></div>
+      <button type="submit" class="btn">Enviar Votación</button>
+    </form>
+  </div>
   <script>
     const paises = [
       { codigo: "se", nombre: "Suecia" },
@@ -38,7 +34,7 @@
       div.className = "pais";
       div.innerHTML = `
         <img src="images/${pais.codigo}.svg" alt="${pais.nombre}">
-        <span>${pais.nombre}</span>
+        <label>${pais.nombre}</label>
         <select name="${pais.codigo}">
           <option value="">--</option>
           ${[12,10,8,7,6,5,4,3,2,1].map(p => `<option value="${p}">${p}</option>`).join('')}
