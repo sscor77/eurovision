@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Administrador</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="container">
+  <h1>Ranking Final</h1>
+  <form id="form">
+    <div id="paises"></div>
+    <button type="submit" class="btn">Guardar Ranking</button>
+  </form>
+</div>
+<script>
+const paises = [
+  "Suecia", "España", "Italia", "Francia", "Alemania",
+  "Grecia", "Noruega", "Reino Unido", "Polonia", "Ucrania"
+];
+const contenedor = document.getElementById("paises");
+paises.forEach(pais => {
+  const div = document.createElement("div");
+  div.className = "pais";
+  div.innerHTML = `
+    <label>${pais}</label>
+    <select name="${pais}">
+      <option value="">--</option>
+      ${[...Array(10)].map((_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}
+    </select>
+  `;
+  contenedor.appendChild(div);
+});
+
+document.getElementById("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const data = new FormData(e.target);
+  const usados = new Set();
+  const ranking = [];
+  for (let [pais, pos] of data.entries()) {
+    if (!pos || usados.has(pos)) {
+      alert("Posiciones duplicadas o vacías.");
+      return;
+    }
+    usados.add(pos);
+    ranking.push({ pais, posicion: Number(pos) });
+  }
+  if (ranking.length !== 10) {
+    alert("Debes ordenar los 10 países.");
+    return;
+  }
+  localStorage.setItem("top10_final", JSON.stringify(ranking));
+  alert("✅ Ranking guardado.");
+});
+</script>
+</body>
+</html>

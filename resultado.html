@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultados</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="container">
+  <h1>Resultados Finales</h1>
+  <div id="tabla"></div>
+  <div id="resumen"></div>
+</div>
+<script>
+const votos1 = JSON.parse(localStorage.getItem("votos_usuario1")) || [];
+const votos2 = JSON.parse(localStorage.getItem("votos_usuario2")) || [];
+const top10 = JSON.parse(localStorage.getItem("top10_final")) || [];
+
+if (!votos1.length || !votos2.length || !top10.length) {{
+  document.getElementById("tabla").innerHTML = "<p>Faltan datos.</p>";
+}} else {{
+  const getPuntos = (lista, pais) => lista.find(v => v.pais === pais)?.puntos || '-';
+  let ac1 = 0, ac2 = 0, dif1 = 0, dif2 = 0;
+  const rows = top10.map(entry => {{
+    const p = entry.pais;
+    const pos = entry.posicion;
+    const v1 = getPuntos(votos1, p);
+    const v2 = getPuntos(votos2, p);
+    if (v1 === pos) ac1++;
+    if (v2 === pos) ac2++;
+    if (typeof v1 === 'number') dif1 += Math.abs(v1 - pos);
+    if (typeof v2 === 'number') dif2 += Math.abs(v2 - pos);
+    return `<tr><td>${pos}</td><td>${p}</td><td>${v1}</td><td>${v2}</td></tr>`;
+  }}).join("");
+
+  document.getElementById("tabla").innerHTML = `
+    <table>
+      <tr><th>Pos</th><th>País</th><th>Usuario 1</th><th>Usuario 2</th></tr>
+      ${rows}
+    </table>
+  `;
+  const ganador = ac1 > ac2 ? "🎉 Usuario 1 gana" : ac2 > ac1 ? "🎉 Usuario 2 gana" : "🤝 Empate";
+  document.getElementById("resumen").innerHTML = `
+    <p><strong>Aciertos exactos:</strong> U1: ${ac1}, U2: ${ac2}</p>
+    <p><strong>Diferencia total:</strong> U1: ${dif1}, U2: ${dif2}</p>
+    <p style="color: gold; font-weight: bold;">${ganador}</p>
+  `;
+}}
+</script>
+</body>
+</html>
