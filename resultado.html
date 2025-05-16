@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultados Eurovisión</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="container">
+  <h1>Resultados Finales</h1>
+  <div id="resultados"></div>
+  <div id="resumen" style="margin-top: 2rem;"></div>
+</div>
+<script>
+  const votos1 = JSON.parse(localStorage.getItem("votos_usuario1")) || [];
+  const votos2 = JSON.parse(localStorage.getItem("votos_usuario2")) || [];
+  const top = JSON.parse(localStorage.getItem("top26_final")) || [];
+
+  if (!votos1.length || !votos2.length || !top.length) {
+    document.getElementById("resultados").innerHTML = "<p>Faltan datos.</p>";
+  } else {
+    const getPuntos = (votos, pais) => votos.find(v => v.pais === pais)?.puntos || '-';
+
+    let dif1 = 0, dif2 = 0;
+    let rows = "";
+    top.sort((a, b) => a.posicion - b.posicion).forEach(entry => {
+      const p = entry.pais;
+      const pos = entry.posicion;
+      const v1 = getPuntos(votos1, p);
+      const v2 = getPuntos(votos2, p);
+
+      const d1 = typeof v1 === 'number' ? Math.abs(v1 - pos) : "-";
+      const d2 = typeof v2 === 'number' ? Math.abs(v2 - pos) : "-";
+
+      if (typeof d1 === 'number') dif1 += d1;
+      if (typeof d2 === 'number') dif2 += d2;
+
+      rows += `<tr><td>${pos}</td><td>${p}</td><td>${v1}</td><td>${v2}</td></tr>`;
+    });
+
+    const tabla = `
+      <table>
+        <thead>
+          <tr><th>Posición Final</th><th>País</th><th>Usuario 1</th><th>Usuario 2</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+    document.getElementById("resultados").innerHTML = tabla;
+
+    let ganador = dif1 < dif2 ? "🎉 Usuario 1 gana (más cercano al ranking)" :
+                  dif2 < dif1 ? "🎉 Usuario 2 gana (más cercano al ranking)" : "🤝 Empate";
+
+    document.getElementById("resumen").innerHTML = `
+      <p><strong>Diferencia total Usuario 1:</strong> ${dif1}</p>
+      <p><strong>Diferencia total Usuario 2:</strong> ${dif2}</p>
+      <p style="color: gold; font-weight: bold;">${ganador}</p>
+    `;
+  }
+</script>
+</body>
+</html>
