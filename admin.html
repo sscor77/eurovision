@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Eurovisión</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "./countries.js": "./countries.js",
+        "./admin.js": "./admin.js",
+        "./utils.js": "./utils.js"
+      }
+    }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Panel de Administrador de Eurovisión</h1>
+        <nav>
+            <a href="index.html">Selección de Usuario</a>
+            <a href="admin.html" class="active">Página de Administrador</a>
+        </nav>
+    </header>
+    <main>
+        <section id="admin-ranking-section">
+            <h2>Introducir Resultados Finales Oficiales</h2>
+            <div id="admin-country-list" class="country-list-admin">
+                <!-- Admin ranking form will be generated here -->
+            </div>
+            <button id="submit-admin-results">Guardar Resultados Oficiales y Calcular Ganador</button>
+            <p id="admin-message" class="message"></p>
+        </section>
+        <section id="results-section">
+            <h2>Resultados del Concurso de Usuarios</h2>
+            <div id="winner-display">
+                <p>Aquí se mostrarán los resultados una vez que el administrador haya enviado las puntuaciones finales.</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Concurso Eurovisión</p>
+    </footer>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
