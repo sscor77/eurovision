@@ -1,0 +1,177 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votaciones Eurovisión</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Votaciones Eurovisión 2024</h1>
+        <nav>
+            <h2>Páginas de Votación de Usuarios:</h2>
+            <ul>
+                <li><a href="vote.html?user=Santi">Santi</a></li>
+                <li><a href="vote.html?user=Rocio">Rocío</a></li>
+                <li><a href="vote.html?user=Ricardo">Ricardo</a></li>
+                <li><a href="vote.html?user=Belen">Belén</a></li>
+            </ul>
+            <h2>Página de Administrador:</h2>
+            <ul>
+                <li><a href="admin.html">Administrador</a></li>
+            </ul>
+            <div style="text-align: center; margin: 15px 0;">
+                <button id="lock-voting-button">Cerrar Votaciones</button>
+                <p id="lock-status-message"></p>
+            </div>
+        </nav>
+
+        <h2>Resultados Finales</h2>
+        <div id="final-results-area">
+            <p>Cargando resultados...</p>
+        </div>
+    </div>
+    <script type="module">
+        // Clean up old localStorage keys if any (for dev/testing)
+        // localStorage.removeItem('eurovision_official_ranking');
+        // ['Santi', 'Rocio', 'Ricardo', 'Belen'].forEach(user => localStorage.removeItem(`votes_${user}`));
+
+        import { countries, users, TOTAL_RANKS, ADMIN_PASSWORD } from './js/config.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const finalResultsArea = document.getElementById('final-results-area');
+
+            function getCountryNameById(countryId) {
+                const country = countries.find(c => c.id === countryId);
+                return country ? country.name : 'Desconocido';
+            }
+
+            function displayFinalResults() {
+                finalResultsArea.innerHTML = ''; // Clear previous results
+
+                const officialRankingJSON = localStorage.getItem('eurovision_official_ranking');
+                if (!officialRankingJSON) {
+                    finalResultsArea.innerHTML = '<p>El ranking oficial aún no ha sido publicado.</p>';
+                    return;
+                }
+
+                const officialRanking = JSON.parse(officialRankingJSON);
+                if (Object.keys(officialRanking).length < TOTAL_RANKS) {
+                    finalResultsArea.innerHTML = '<p>El ranking oficial aún no está completo. Resultados pendientes.</p>';
+                    return;
+                }
+
+                let maxCoincidences = -1;
+                let winners = [];
+                const resultsList = document.createElement('ul');
+                resultsList.classList.add('results-summary-list');
+
+                users.forEach(userName => {
+                    const userVotesStored = localStorage.getItem(`votes_${userName}`);
+                    let coincidencesCount = 0;
+                    let matchedCountriesDetails = [];
+                    const li = document.createElement('li');
+
+                    if (userVotesStored) {
+                        const userVotes = JSON.parse(userVotesStored);
+                        for (const countryId in userVotes) {
+                            if (userVotes[countryId] !== null && officialRanking[countryId] !== undefined &&
+                                parseInt(userVotes[countryId]) === parseInt(officialRanking[countryId])) {
+                                coincidencesCount++;
+                                matchedCountriesDetails.push(`${getCountryNameById(countryId)} (Puesto ${officialRanking[countryId]})`);
+                            }
+                        }
+                    }
+
+                    let detailsString = matchedCountriesDetails.length > 0 ? ` (${matchedCountriesDetails.join(', ')})` : '';
+                    if (!userVotesStored) {
+                        li.innerHTML = `<strong>${userName}</strong>: No hay votos registrados.`;
+                    } else {
+                        li.innerHTML = `<strong>${userName}</strong>: ${coincidencesCount} coincidencia(s)${detailsString}`;
+                    }
+                    resultsList.appendChild(li);
+
+                    if (userVotesStored) { // Only consider users who have voted for winning
+                        if (coincidencesCount > maxCoincidences) {
+                            maxCoincidences = coincidencesCount;
+                            winners = [userName];
+                        } else if (coincidencesCount === maxCoincidences && maxCoincidences !== -1) {
+                            winners.push(userName);
+                        }
+                    }
+                });
+
+                finalResultsArea.appendChild(resultsList);
+
+                if (winners.length > 0 && maxCoincidences > 0) {
+                    const winnerP = document.createElement('p');
+                    winnerP.classList.add('winner-announcement');
+                    winnerP.innerHTML = `<strong>🏆 Ganador(es): ${winners.join(', ')} con ${maxCoincidences} coincidencias! 🏆</strong>`;
+                    finalResultsArea.appendChild(winnerP);
+                } else if (maxCoincidences === 0) { // All users who voted got 0 points
+                    const noWinnerP = document.createElement('p');
+                    noWinnerP.classList.add('no-winner-announcement');
+                    noWinnerP.innerHTML = '<strong>Nadie tuvo coincidencias.</strong>';
+                    finalResultsArea.appendChild(noWinnerP);
+                } else if (maxCoincidences === -1 ) { // No users have voted yet or official ranking not ready
+                    const pendingP = document.createElement('p');
+                    pendingP.innerHTML = 'Esperando votos de los usuarios para determinar al ganador.';
+                    finalResultsArea.appendChild(pendingP);
+                }
+            }
+
+            displayFinalResults();
+
+            // Listen for storage changes to update results dynamically
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'eurovision_official_ranking' || (event.key && event.key.startsWith('votes_'))) {
+                    displayFinalResults();
+                }
+            });
+
+            // Lock Voting Button Logic
+            const lockVotingButton = document.getElementById('lock-voting-button');
+            const lockStatusMessage = document.getElementById('lock-status-message');
+
+            function updateLockVotingButtonState() {
+                if (localStorage.getItem('voting_locked') === 'true') {
+                    lockVotingButton.disabled = true;
+                    lockVotingButton.textContent = 'Votaciones Cerradas';
+                    lockStatusMessage.textContent = 'Las votaciones han sido cerradas por el administrador.';
+                    lockStatusMessage.style.color = 'red';
+                } else {
+                    lockVotingButton.disabled = false;
+                    lockVotingButton.textContent = 'Cerrar Votaciones';
+                    lockStatusMessage.textContent = ''; // Clear message
+                }
+            }
+
+            updateLockVotingButtonState(); // Set initial state
+
+            lockVotingButton.addEventListener('click', () => {
+                const password = prompt('Introduce la contraseña de administrador para cerrar las votaciones:');
+                if (password === ADMIN_PASSWORD) {
+                    localStorage.setItem('voting_locked', 'true');
+                    updateLockVotingButtonState(); // Update button and message
+                    lockStatusMessage.textContent = '¡Votaciones cerradas con éxito!'; // Override for success
+                    lockStatusMessage.style.color = 'green';
+                    alert('Las votaciones han sido cerradas. Los usuarios ya no podrán modificar sus votos.');
+                } else if (password !== null) { // User entered something, but it was wrong
+                    alert('Contraseña incorrecta.');
+                    lockStatusMessage.textContent = 'Contraseña incorrecta. Las votaciones siguen abiertas.';
+                    lockStatusMessage.style.color = 'red';
+                } else { // User cancelled the prompt
+                    lockStatusMessage.textContent = 'Cierre de votaciones cancelado.';
+                    lockStatusMessage.style.color = 'orange';
+                }
+            });
+             // Listen for storage changes to update button if changed in another tab (e.g. admin unlocks somehow)
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'voting_locked') {
+                    updateLockVotingButtonState();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
